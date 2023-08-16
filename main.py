@@ -6,6 +6,9 @@ import time
 import matplotlib.pyplot as plt
 from PIL import ImageGrab
 
+def test():
+    print("hello world")
+
 def capture_image():
     # 捕获摄像头图像
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
@@ -89,6 +92,7 @@ def slope(image_path=None, img_frame=None):
 2、像素的大小转换为实际的角度大小，旋转
 
 思考： 用调整的方式来使得值在一个目标的值附近移动，直到趋于理想
+3、由于旋转的装置的圆心与摄像头的光心不重合 导致在旋转的时候其他方向的也会发生变
 
 """
 
