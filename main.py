@@ -115,7 +115,8 @@ def hough(image_path=None, img_frame=np.array([])):
 
     img_res = img[center_y - 100:center_y + 100,center_x - 100:center_x + 100]  # 感兴趣区域先是纵向，然后是横向
     gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
-
+    # cv2.imshow("灰度图片",gray)
+    # cv2.waitKey(0)
     # 将灰度图转为二值图
     thresh = 127
     _, binary_image = cv2.threshold(gray, thresh, 255, cv2.THRESH_BINARY)
@@ -123,11 +124,13 @@ def hough(image_path=None, img_frame=np.array([])):
     edges = cv2.Canny(gray, 50, 150)
     # 2.霍夫直线变换
     lines_ = cv2.HoughLines(edges, 0.8, np.pi / 180, 90)
+    lines_select=lines_[:,0,1]
     count_first = lines_.shape[0]
-    count_third = lines_.shape[2]
     # 创建KMeans模型，设置聚类数为2，因为已知是两条故聚类设置为2
     kmeans = KMeans(n_clusters=2, n_init=10)
-    lines = lines_.reshape(count_first, count_third)
+    lines = lines_select.reshape(count_first, 1)
+    lines_42 = lines_.reshape(count_first, 2)
+
     # 拟合模型
     kmeans.fit(lines)
     # 获取聚类标签
@@ -143,12 +146,12 @@ def hough(image_path=None, img_frame=np.array([])):
         #     clusters[label] = []
         # clusters[label].append(lines[i])
         if label == 1:
-            theta_sum_1 += lines[i][1]
-            roh_sum_1 += lines[i][0]
+            theta_sum_1 += lines_42[i][1]
+            roh_sum_1 += lines_42[i][0]
             count_1 += 1
         else:
-            theta_sum_0 += lines[i][1]
-            roh_sum_0 += lines[i][0]
+            theta_sum_0 += lines_42[i][1]
+            roh_sum_0 += lines_42[i][0]
             count_0 += 1
     # 获得旋转平均值
     theta_mean_1 = theta_sum_1 / count_1
@@ -166,9 +169,13 @@ def hough(image_path=None, img_frame=np.array([])):
     intersection_x = res_equation[0]
     intersection_y = res_equation[1]
 
+    height_res, width_res, _ = img_res.shape
+    center_res_x = width_res // 2
+    center_res_y = height_res // 2
+
     # 如果要将摄像头的中心位置移动到交点
-    x_distance = intersection_x - center_x  # 向左移动像素点
-    y_distance = intersection_y - center_y  # 向下移动像素点
+    x_distance = intersection_x - center_res_x  # 向左移动像素点
+    y_distance = intersection_y - center_res_y  # 向下移动像素点
     print("向左移动" + str(x_distance) + "个像素点" + '\n' + "向下移动" + str(y_distance) + "个像素点")
 
     # 调整相机的pitch角和yaw角，根据图片的横纵中轴线位置上下的像素点的个数来推断 用百分比的差
@@ -194,9 +201,9 @@ def hough(image_path=None, img_frame=np.array([])):
 
 if __name__ == "__main__":
     while True:
-        # 从本地读取图片
-        # calibration_image_path = r"calibration_picture.jpg"
-        # hough(image_path=calibration_image_path)
+        #从本地读取图片
+        calibration_image_path = r"calibration_picture.jpg"
+        hough(image_path=calibration_image_path)
 
         # 从摄像头读取图片
         # camera_frame = capture_image()
