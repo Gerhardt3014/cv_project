@@ -114,14 +114,15 @@ def hough(image_path=None, img_frame=np.array([])):
     center_y = height // 2
 
     img_res = img[center_y - 100:center_y + 100,center_x - 100:center_x + 100]  # 感兴趣区域先是纵向，然后是横向
-    gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
+    gray_res = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # cv2.imshow("灰度图片",gray)
     # cv2.waitKey(0)
     # 将灰度图转为二值图
     thresh = 127
     _, binary_image = cv2.threshold(gray, thresh, 255, cv2.THRESH_BINARY)
     # 边缘检测算法
-    edges = cv2.Canny(gray, 50, 150)
+    edges = cv2.Canny(gray_res, 50, 150)
     # 2.霍夫直线变换
     lines_ = cv2.HoughLines(edges, 0.8, np.pi / 180, 90)
     lines_select=lines_[:,0,1]
@@ -178,7 +179,7 @@ def hough(image_path=None, img_frame=np.array([])):
     y_distance = intersection_y - center_res_y  # 向下移动像素点
     print("向左移动" + str(x_distance) + "个像素点" + '\n' + "向下移动" + str(y_distance) + "个像素点")
 
-    # 调整相机的pitch角和yaw角，根据图片的横纵中轴线位置上下的像素点的个数来推断 用百分比的差
+    # 调整相机的pitch角和yaw角，根据图片的横纵中轴线位置上下的像素值大于100的个数来推断 用百分比的差
     up_row = binary_image[:center_y]
     down_row = binary_image[center_y:]
     left_column = binary_image[:, :center_x]

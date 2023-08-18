@@ -10,6 +10,7 @@ pil_image = ImageGrab.grab(bbox)
 pil_image.save('screenshot.png') # 保存截图
 
 # 将Pillow图像转换为numpy数组，并将RGB转换为BGR
+# OpenCV默认使用BGR格式，而PIL使用RGB格式
 cv_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
 # 现在可以使用cv2处理图像了
